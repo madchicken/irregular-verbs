@@ -1,36 +1,35 @@
 import { TextInputField } from "evergreen-ui"
 import React from "react"
+import {Verb, VerbFields} from "./verbs";
 
 export interface Props {
-    correctValue: string;
+    verb: Verb;
+    field: VerbFields;
+    altCorrectValue?: string;
     readonly: boolean;
     showError: boolean;
-    isValid: (s: string) => void
+    validate: (v: Verb, field: VerbFields, inputValue: string) => boolean
 }
 
 export function VerbField(props: Props) {
     const [state, setState] = React.useState('');
+    const {altCorrectValue, readonly, showError, validate, field, verb} = props;
+    const correctValue = verb[field];
 
-    function checkIsValid() {
-        return props.correctValue.toLowerCase() !== state?.toLowerCase().trim();
-    }
-
-    if(props.showError) {
-        const validationMessage = checkIsValid() ? `Il valore corretto è ${props.correctValue}` : null;
-        const isInvalid = props.showError && !props.readonly ? !!validationMessage : false;
-        if(!isInvalid && !props.readonly) {
-            props.isValid(props.correctValue);
-        }
+    if(showError && !readonly) {
+        const correct = altCorrectValue ? `${correctValue} o ${altCorrectValue}` : correctValue;
+        const isValid = validate(verb, field, state);
+        const validationMessage = isValid ? null : `Il valore corretto è ${correct}`;
         return <TextInputField
             onChange={(e: any) => {
                 setState(e.target.value);
             }}
             label="&nbsp;"
-            value={props.readonly ? props.correctValue : state}
-            disabled={props.readonly}
-            required={!props.readonly}
-            validationMessage={props.showError && !props.readonly ? validationMessage : null}
-            isInvalid={isInvalid}
+            value={readonly ? correctValue : state}
+            disabled={readonly}
+            required={!readonly}
+            validationMessage={validationMessage}
+            isInvalid={!isValid}
         />
     }
     return <TextInputField
@@ -38,8 +37,8 @@ export function VerbField(props: Props) {
             setState(e.target.value);
         }}
         label="&nbsp;"
-        value={props.readonly ? props.correctValue : state}
-        disabled={props.readonly}
-        required={!props.readonly}
+        value={readonly ? correctValue : state}
+        disabled={readonly}
+        required={!readonly}
         />
 }

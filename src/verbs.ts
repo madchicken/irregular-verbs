@@ -1,13 +1,14 @@
+export type VerbFields = 'base' | 'translation' | 'pastParticiple' | 'simplePast';
+export const VERB_FIELDS: VerbFields[] = ['base', 'translation', 'pastParticiple', 'simplePast'];
+
 export interface Verb {
     base: string;
     simplePast: string;
     pastParticiple: string;
     translation: string;
     altTranslation? : string;
-    fixedField?: string;
+    fixedField?: VerbFields;
 }
-
-export const VERB_FIELDS = ['base', 'translation', 'pastParticiple', 'simplePast'];
 
 export const verbs: Verb[] = [
     {
@@ -166,7 +167,7 @@ export const verbs: Verb[] = [
         base: 'make',
         simplePast: 'made',
         pastParticiple: 'made',
-        translation: 'fare'
+        translation: 'fare con le mani'
     },
     {
         base: 'send',
