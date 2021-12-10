@@ -1,6 +1,7 @@
-# Getting Started with Create React App
+# Irregular verbs
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This app helps to learn english irregular verbs and their Italian translation.
+For now, it only supports 30 verbs.
 
 ## Available Scripts
 
