@@ -14,7 +14,7 @@ const shuffleVerbs = (n: number) => {
         return v;
     });
 }
-const MAX_VERBS = 10;//verbs.length;
+const MAX_VERBS = verbs.length;
 let selectedVerbs = shuffleVerbs(MAX_VERBS);
 let countValid: Record<string, boolean> = {};
 let invalidVerbs: Verb[] = [];
