@@ -1,28 +1,34 @@
 import { TextInputField } from "evergreen-ui"
 import React from "react"
-import {Verb, VerbFields} from "./verbs";
+import {TestVerb, VerbFields} from "./verbs";
+import {first, isArray} from "lodash";
+import {validate} from "./App";
 
 export interface Props {
-    verb: Verb;
+    verb: TestVerb;
     field: VerbFields;
-    altCorrectValue?: string;
     readonly: boolean;
     showError: boolean;
-    validate: (v: Verb, field: VerbFields, inputValue: string) => boolean
+    setUserInput: (s: string, f: VerbFields) => void;
+}
+
+function getValue(verb: TestVerb, field: VerbFields): string {
+    return first(field === 'translations' ? verb[field] as string[] : [verb[field]]) || '';
 }
 
 export function VerbField(props: Props) {
-    const [state, setState] = React.useState('');
-    const {altCorrectValue, readonly, showError, validate, field, verb} = props;
-    const correctValue = verb[field];
+    const [state, setState] = React.useState<string>(props.verb.input[props.verb.fixedField] || '');
+    const {readonly, showError, field, verb} = props;
+    const correctValue = getValue(verb, field);
 
     if(showError && !readonly) {
-        const correct = altCorrectValue ? `${correctValue} o ${altCorrectValue}` : correctValue;
-        const isValid = validate(verb, field, state);
-        const validationMessage = isValid ? null : `Il valore corretto è ${correct}`;
+        const correct = isArray(correctValue) ? correctValue.join(' o ') : correctValue;
+        const isValid = isArray(correctValue) ? correctValue.find(s => s === state?.toLowerCase()) : correctValue === state;
+        const validationMessage = isValid ? null : `Il valore corretto è *${correct}*`;
         return <TextInputField
             onChange={(e: any) => {
                 setState(e.target.value);
+                props.setUserInput(e.target.value, field);
             }}
             label="&nbsp;"
             value={readonly ? correctValue : state}
@@ -35,6 +41,7 @@ export function VerbField(props: Props) {
     return <TextInputField
         onChange={(e: any) => {
             setState(e.target.value);
+            props.setUserInput(e.target.value, field);
         }}
         label="&nbsp;"
         value={readonly ? correctValue : state}

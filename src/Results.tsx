@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Dialog, Pane} from "evergreen-ui";
+import {Dialog} from "evergreen-ui";
 
 export function Results() {
     const [isShown, setIsShown] = React.useState(false)

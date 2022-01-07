@@ -1,17 +1,12 @@
 import {Table} from 'evergreen-ui';
-import {Verb, VerbFields} from './verbs';
+import {TestVerb, Verb, VerbFields} from './verbs';
 import {VerbField} from "./VerbField";
 import React from "react";
 
-export interface VerbQuestion {
-    verb: Verb;
-    fixedField: VerbFields;
-}
-
 interface Props {
-    verbs: Verb[],
+    verbs: TestVerb[],
     showErrors: boolean;
-    validate: (v: Verb, field: VerbFields, inputValue: string) => boolean
+    setUserInput: (s:string, f: VerbFields, v: TestVerb) => void
 }
 
 function isReadonly(v: Verb, field: keyof Verb) {
@@ -33,27 +28,26 @@ export function VerbsTable(props: Props) {
                         <Table.Row key={verb.base}>
                             <Table.TextCell><VerbField field="base"
                                                        verb={verb}
+                                                       setUserInput={(s) => props.setUserInput(s, 'base', verb)}
                                                        readonly={isReadonly(verb, 'base')}
-                                                       validate={props.validate}
                                                        showError={props.showErrors}/>
                             </Table.TextCell>
                             <Table.TextCell><VerbField field="simplePast"
                                                        verb={verb}
+                                                       setUserInput={(s) => props.setUserInput(s, 'simplePast', verb)}
                                                        readonly={isReadonly(verb, 'simplePast')}
-                                                       validate={props.validate}
                                                        showError={props.showErrors}/>
                             </Table.TextCell>
                             <Table.TextCell><VerbField field="pastParticiple"
                                                        verb={verb}
+                                                       setUserInput={(s) => props.setUserInput(s, 'pastParticiple', verb)}
                                                        readonly={isReadonly(verb, 'pastParticiple')}
-                                                       validate={props.validate}
                                                        showError={props.showErrors}/>
                             </Table.TextCell>
-                            <Table.TextCell><VerbField field="translation"
+                            <Table.TextCell><VerbField field="translations"
                                                        verb={verb}
-                                                       altCorrectValue={verb.altTranslation}
-                                                       readonly={isReadonly(verb, 'translation')}
-                                                       validate={props.validate}
+                                                       setUserInput={(s) => props.setUserInput(s, 'translations', verb)}
+                                                       readonly={isReadonly(verb, 'translations')}
                                                        showError={props.showErrors}/>
                             </Table.TextCell>
                         </Table.Row>

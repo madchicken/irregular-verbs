@@ -2,71 +2,113 @@ import React from 'react';
 import './App.css';
 import {Button, Dialog, Pane} from 'evergreen-ui'
 import {VerbsTable} from "./VerbsTable";
-import {Verb, VERB_FIELDS, VerbFields, verbs} from "./verbs";
+import {TestVerb, Verb, VERB_FIELDS, VerbFields, verbsMap} from "./verbs";
 import {random, shuffle, slice} from 'lodash';
+import {StartTest} from "./StartTest";
+import party from "party-js";
 
-
-const shuffleVerbs = (n: number) => {
-    const shuffled = slice(shuffle(verbs), 0, n);
+const shuffleVerbs = (verbs: Verb[], n?: number) => {
+    const shuffled = slice(shuffle(verbs), 0, Math.min(verbs.length, n || verbs.length));
     return shuffled.map(v => {
-        const number = random(0, 3);
-        v.fixedField = VERB_FIELDS[number];
-        return v;
+        return { ...v, input: { base: '', 'translations': '', 'pastParticiple': '', 'simplePast': ''}, fixedField: VERB_FIELDS[random(0, 3)]};
     });
 }
-const MAX_VERBS = verbs.length;
-let selectedVerbs = shuffleVerbs(MAX_VERBS);
-let countValid: Record<string, boolean> = {};
-let invalidVerbs: Verb[] = [];
+
+interface State {
+    showErrors: boolean;
+    selectedVerbs: TestVerb[];
+    size: number;
+    invalidVerbs: Record<VerbFields, boolean>[];
+    showResult: boolean;
+}
+
+export function validate(verb: TestVerb): Record<VerbFields, boolean> {
+    return VERB_FIELDS.reduce((res, field) => {
+        if(field !== verb.fixedField) {
+            const correctValues = field === 'translations' ? verb[field] as string[] : [verb[field]];
+            if(verb.input[field] !== undefined) {
+                res[field] = !!correctValues.find(c => c === verb.input[field]?.toLowerCase().trim());
+            } else {
+                res[field] = true;
+            }
+        }
+        return res;
+    }, {} as Record<VerbFields, boolean>)
+}
 
 function App() {
-    const [state, setState] = React.useState({showErrors: false, selectedVerbs});
-    const [isShown, setIsShown] = React.useState(false)
-    return (
-        <Pane padding={16} background="tint2" borderRadius={3}>
-            <VerbsTable verbs={state.selectedVerbs} showErrors={state.showErrors} validate={(verb: Verb, field: VerbFields, input: string) => {
-                const correctValue = verb[field];
-                let correct = correctValue.toLowerCase() === input?.toLowerCase().trim();
-                if (verb.altTranslation && !correct) {
-                    correct = verb.altTranslation.toLowerCase() === input?.toLowerCase().trim();
-                }
-                if (correct) {
-                    countValid[`${field}_${correctValue}`] = true;
+    const [state, setState] = React.useState<State>({
+        showErrors: false,
+        selectedVerbs: [] as TestVerb[],
+        size: 0,
+        invalidVerbs: [],
+        showResult: false,
+    });
+    if(state.selectedVerbs.length === 0) {
+        return (
+            <Pane width="100%" margin="auto" display="flex" justifyContent="center">
+                <StartTest setsOfVerbs={verbsMap} onOk={(selectedVerbs, size) => setState({...state, selectedVerbs: shuffleVerbs(selectedVerbs, size), size})}/>
+            </Pane>
+        )
+    }
+    const resCount = state.invalidVerbs.reduce((c, x) => {
+        Object.keys(x).forEach((k) => {
+            // @ts-ignore
+            if (x[k] !== undefined) {
+                // @ts-ignore
+                if (x[k]) {
+                    c.valid++;
                 } else {
-                    if (invalidVerbs.indexOf(verb) === -1) {
-                        invalidVerbs.push(verb);
-                    }
+                    c.invalid++;
                 }
-                return correct;
-            }} />
+            }
+        })
+        return c;
+    }, {
+        invalid: 0,
+        valid: 0
+    });
+    const reset = () => {
+        setState({...state, selectedVerbs: [], showErrors: false, size: 0, invalidVerbs: [], showResult: false});
+    };
+    if(resCount.invalid === 0 && state.showResult) {
+        // @ts-ignore
+        party.confetti(document.getElementById('root'), {
+            gravity: 800
+        });
+    }
+    return (
+        <Pane padding={16} background="blueTint" borderRadius={3}>
+            <VerbsTable verbs={state.selectedVerbs} showErrors={state.showErrors} setUserInput={(s, f, v)=> {
+                const res = state.selectedVerbs.find(verb => verb === v);
+                if(res) {
+                    res.input[f] = s;
+                }
+            }}/>
             <Pane display="flex" padding={16} background="tint2" borderRadius={3}>
                 <Button appearance="primary" onClick={() => {
-                    countValid = {};
-                    setState({...state, showErrors: true});
-                    setImmediate(() => {
-                        setIsShown(true);
-                    });
+                    const invalidVerbs = state.selectedVerbs.map(verb => validate(verb));
+                    setState({...state, invalidVerbs, showErrors: true, showResult: true});
                 }} marginRight={16}>Invia</Button>
-                <Button onClick={() => {
-                    selectedVerbs = shuffleVerbs(MAX_VERBS);
-                    countValid = {};
-                    invalidVerbs.length = 0;
-                    setState({selectedVerbs, showErrors: false});
-                }}>Reset</Button>
+                <Button onClick={reset}>Reset</Button>
                 <Dialog
-                    isShown={isShown}
+                    isShown={state.showResult}
                     title="Risultato"
-                    onCloseComplete={() => setIsShown(false)}
-                    onCancel={() => {
-                        selectedVerbs = invalidVerbs;
-                        countValid = {};
-                        setState({selectedVerbs, showErrors: false});
-                        setIsShown(false);
+                    onConfirm={() => {
+                        setState({...state, invalidVerbs: [], showErrors: false, showResult: false});
+                        if(resCount.invalid === 0) {
+                            reset();
+                        }
                     }}
-                    cancelLabel="Riprova quelli sbagliati"
+                    onCancel={() => {
+                        setState({...state, showErrors: true, showResult: false});
+                    }}
                     confirmLabel="OK"
                 >
-                    Numero di risposte esatte {Object.keys(countValid).length} su {selectedVerbs.length * 3}
+                    {resCount.invalid > 0 ?
+                        (<Pane>Numero di risposte esatte {resCount.valid} su {resCount.valid + resCount.invalid}</Pane>) :
+                        (<Pane>Esercizio corretto!! 🎉 </Pane>)
+                    }
                 </Dialog>
             </Pane>
         </Pane>
