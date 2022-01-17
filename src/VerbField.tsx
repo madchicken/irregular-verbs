@@ -2,7 +2,6 @@ import { TextInputField } from "evergreen-ui"
 import React from "react"
 import {TestVerb, VerbFields} from "./verbs";
 import {first, isArray} from "lodash";
-import {validate} from "./App";
 
 export interface Props {
     verb: TestVerb;
@@ -23,7 +22,7 @@ export function VerbField(props: Props) {
 
     if(showError && !readonly) {
         const correct = isArray(correctValue) ? correctValue.join(' o ') : correctValue;
-        const isValid = isArray(correctValue) ? correctValue.find(s => s === state?.toLowerCase()) : correctValue === state;
+        const isValid = isArray(correctValue) ? correctValue.find(s => s === state?.toLowerCase()) : correctValue === state.toLowerCase();
         const validationMessage = isValid ? null : `Il valore corretto è *${correct}*`;
         return <TextInputField
             onChange={(e: any) => {

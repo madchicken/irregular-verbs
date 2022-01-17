@@ -301,10 +301,142 @@ const verbs2: Verb[] = [
         pastParticiple: 'kept',
         translations: ['mantenere']
     },
-]
+];
+
+const verbs3 = [
+    {
+        base: 'learn',
+        simplePast: 'learnt',
+        pastParticiple: 'learnt',
+        translations: ['imparare']
+    },
+    {
+        base: 'pay',
+        simplePast: 'paid',
+        pastParticiple: 'paid',
+        translations: ['pagare']
+    },
+    {
+        base: 'put',
+        simplePast: 'put',
+        pastParticiple: 'put',
+        translations: ['mettere']
+    },
+    {
+        base: 'ride',
+        simplePast: 'rode',
+        pastParticiple: 'ridden',
+        translations: ['andare a cavallo', 'andare in bici', 'andare a cavallo, in bici']
+    },
+    {
+        base: 'ring',
+        simplePast: 'rang',
+        pastParticiple: 'rung',
+        translations: ['suonare il campanello']
+    },
+    {
+        base: 'say',
+        simplePast: 'said',
+        pastParticiple: 'said',
+        translations: ['dire']
+    },
+    {
+        base: 'sell',
+        simplePast: 'sold',
+        pastParticiple: 'sold',
+        translations: ['vendere']
+    },
+    {
+        base: 'sing',
+        simplePast: 'sang',
+        pastParticiple: 'sung',
+        translations: ['cantare']
+    },
+    {
+        base: 'sit',
+        simplePast: 'sat',
+        pastParticiple: 'sat',
+        translations: ['stare seduti']
+    },
+    {
+        base: 'stand',
+        simplePast: 'stood',
+        pastParticiple: 'stood',
+        translations: ['stare in piedi']
+    },
+    {
+        base: 'spend',
+        simplePast: 'spent',
+        pastParticiple: 'spent',
+        translations: ['trascorrere']
+    },
+    {
+        base: 'steal',
+        simplePast: 'stole',
+        pastParticiple: 'stolen',
+        translations: ['rubare']
+    },
+    {
+        base: 'swim',
+        simplePast: 'swam',
+        pastParticiple: 'swum',
+        translations: ['nuotare']
+    },
+    {
+        base: 'take',
+        simplePast: 'took',
+        pastParticiple: 'taken',
+        translations: ['prendere', 'portare']
+    },
+    {
+        base: 'teach',
+        simplePast: 'taught',
+        pastParticiple: 'taught',
+        translations: ['insegnare']
+    },
+    {
+        base: 'tell',
+        simplePast: 'told',
+        pastParticiple: 'told',
+        translations: ['dire', 'raccontare']
+    },
+    {
+        base: 'throw',
+        simplePast: 'threw',
+        pastParticiple: 'thrown',
+        translations: ['lanciare', 'gettare']
+    },
+    {
+        base: 'understand',
+        simplePast: 'understood',
+        pastParticiple: 'understood',
+        translations: ['capire']
+    },
+    {
+        base: 'wake',
+        simplePast: 'woke',
+        pastParticiple: 'woken',
+        translations: ['svegliarsi']
+    },
+    {
+        base: 'win',
+        simplePast: 'won',
+        pastParticiple: 'won',
+        translations: ['vincere']
+    },
+    {
+        base: 'write',
+        simplePast: 'wrote',
+        pastParticiple: 'written',
+        translations: ['scrivere']
+    },
+];
 
 export const verbsMap: VerbsSet = {
     'Set 1 (30 verbi)': verbs,
     'Set 2 (18 verbi)': verbs2,
-    'Tutti': [...verbs, ...verbs2],
+    'Set 3 (21 verbi)': verbs3,
+    'Set 1 + Set 2': [...verbs, ...verbs2],
+    'Set 2 + Set 3': [...verbs2, ...verbs3],
+    'Tutti': [...verbs, ...verbs2, ...verbs3],
 }
